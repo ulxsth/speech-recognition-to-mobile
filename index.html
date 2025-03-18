@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>音声認識デモ</title>
+</head>
+<body>
+    <h1>音声認識デモ</h1>
+    <button id="start-btn">音声認識開始</button>
+    <p id="result">ここに認識結果が表示されます。</p>
+
+    <script>
+        // ブラウザがSpeechRecognitionに対応しているか確認
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert('このブラウザは音声認識に対応していません。');
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP'; // 日本語を設定
+
+            const startBtn = document.getElementById('start-btn');
+            const resultPara = document.getElementById('result');
+
+            // 音声認識の結果を取得
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                resultPara.textContent = `認識結果: ${transcript}`;
+            };
+
+            // 音声認識の開始
+            startBtn.addEventListener('click', () => {
+                recognition.start();
+                resultPara.textContent = '音声認識中...';
+            });
+        }
+    </script>
+</body>
+</html>
