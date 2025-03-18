@@ -1,1 +1,1 @@
-# speech-recognition-to-mobile
+SpeechRecognition がモバイルからうまく動作しないので、動く最小限のテストを作って検証する
