@@ -2,11 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>音声認識デモ</title>
+    <title>連続音声認識デモ</title>
 </head>
 <body>
-    <h1>音声認識デモ</h1>
+    <h1>連続音声認識デモ</h1>
     <button id="start-btn">音声認識開始</button>
+    <button id="stop-btn">音声認識停止</button>
     <p id="result">ここに認識結果が表示されます。</p>
 
     <script>
@@ -17,14 +18,25 @@
         } else {
             const recognition = new SpeechRecognition();
             recognition.lang = 'ja-JP'; // 日本語を設定
+            recognition.continuous = true; // 連続的な認識を有効にする
+            recognition.interimResults = true; // 暫定結果を取得する
 
             const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
             const resultPara = document.getElementById('result');
 
             // 音声認識の結果を取得
             recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                resultPara.textContent = `認識結果: ${transcript}`;
+                let interimTranscript = '';
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                resultPara.innerHTML = `最終結果: ${finalTranscript}<br>暫定結果: ${interimTranscript}`;
             };
 
             // 音声認識の開始
@@ -32,6 +44,19 @@
                 recognition.start();
                 resultPara.textContent = '音声認識中...';
             });
+
+            // 音声認識の停止
+            stopBtn.addEventListener('click', () => {
+                recognition.stop();
+                resultPara.textContent = '音声認識を停止しました。';
+            });
+
+            // 音声認識が終了した場合、自動的に再開する
+            recognition.onend = () => {
+                if (recognition.continuous) {
+                    recognition.start();
+                }
+            };
         }
     </script>
 </body>
